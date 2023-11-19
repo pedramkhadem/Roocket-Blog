@@ -63,7 +63,7 @@ class ArticleController extends Controller
 
         ]);
         $article->tag($request->tags);
-        $article->attachMedia($media, 'thumbnail');
+    
 
 
         return new ArticleResource($article);
