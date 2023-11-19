@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Cviebrock\EloquentTaggable\Taggable;
+use Plank\Mediable\Mediable;
+
 
 class Article extends Model
 {
@@ -13,7 +15,9 @@ class Article extends Model
     use HasFactory;
     use Sluggable;
     use Taggable;
+    use Mediable;
 
+    
 
     protected  $fillable =[
         'title',

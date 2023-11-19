@@ -34,6 +34,7 @@ Route::group(['prefix'=>'auth/v1' , 'middleware'=>['auth:sanctum']], function(){
 Route::group(['prefix'=>'admin/v1' , 'middleware'=>['auth:sanctum']], function(){
     Route::apiResource('category' , CategoryController::class);
     Route::apiResource('article', ArticleController::class);
+    Route::post('media' , [ArticleController::class , 'mediaUploader']);
 });
 
 

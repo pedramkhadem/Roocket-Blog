@@ -33,6 +33,7 @@ class ArticleResource extends JsonResource
                 'updated_at'=>$this->updated_at,
             ],
             'tags' =>$this->tagList,
+            'thumb'=>$this->getMedia('thumbnail')->first()->getUrl(),
             'show_at_popular'=>$this->show_at_popular,
             'archive'=>$this->archive,
         ];
