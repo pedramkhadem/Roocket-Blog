@@ -26,9 +26,9 @@ class Category extends Model
     }
 
 
-    public function categoyable(): MorphTo
+    public function articles()
     {
-        return $this->morphTo();
+        return $this->hasMany(Article::class , 'category_id');
     }
 
 

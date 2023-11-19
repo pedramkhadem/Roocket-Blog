@@ -21,9 +21,10 @@ class ArticleFactory extends Factory
 
 
             return [
-                'title' =>Faker::sentence(1),
+                'title' =>Faker::word(5),
                 'content'=>Faker::paragraph(3),
                 'author_id'=>1,
+                'category_id'=>2,
                 'meta_title'=>Faker::sentence(3),
                 'meta_description'=>Faker::sentence(6),
                 'shortlink'=>url("/articles",\Str::Random(8)),

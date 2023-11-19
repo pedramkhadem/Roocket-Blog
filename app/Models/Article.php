@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Cviebrock\EloquentTaggable\Taggable;
 
 class Article extends Model
@@ -21,6 +20,7 @@ class Article extends Model
         'content',
         'slug',
         'author_id',
+        'category_id',
         'meta_title',
         'meta_description',
         'shortlink',
@@ -44,9 +44,9 @@ class Article extends Model
 /**get the articel category */
 
 
-    public function category(): MorphOne
+    public function category()
     {
-        return $this->morphOne(Category::class , 'categoryable');
+        return $this->belongsTo(Category::class);
     }
 
 

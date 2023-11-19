@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
@@ -30,6 +31,9 @@ Route::group(['prefix'=>'auth/v1' , 'middleware'=>['auth:sanctum']], function(){
     Route::post('/logout' , [AuthController::class , 'logout']);
 });
 
-Route::prefix('admin/v1')->group(function(){
+Route::group(['prefix'=>'admin/v1' , 'middleware'=>['auth:sanctum']], function(){
     Route::apiResource('category' , CategoryController::class);
+    Route::apiResource('article', ArticleController::class);
 });
+
+
