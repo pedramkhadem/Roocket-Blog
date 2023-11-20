@@ -16,7 +16,6 @@ class ArticleResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-
         return [
             'status' => true,
             'id'=>$this->id,
@@ -33,7 +32,11 @@ class ArticleResource extends JsonResource
                 'updated_at'=>$this->updated_at,
             ],
             'tags' =>$this->tagList,
-            'thumb'=>$this->getMedia('thumbnail')->first()->getUrl(),
+            'thumb'=>$this->when($this->hasMedia('thumbnail'), function() {
+                return $this->firstMedia('thumbnail')->getUrl() ;
+
+            }),
+            // 'thumb'=>$this->when(!$this->hasMedia('thumbnail'),null),
             'show_at_popular'=>$this->show_at_popular,
             'archive'=>$this->archive,
         ];

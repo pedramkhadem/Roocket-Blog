@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreArticleRequest;
+use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\Admin\ArticleResource;
 use App\Models\Article;
 use Illuminate\Foundation\Http\FormRequest;
@@ -19,7 +20,11 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        return ArticleResource::collection(Article::paginate(15));
+
+        $result = Article::where('author_id' , auth()->id())->with(['tags' , 'media'])->paginate(15);
+
+
+        return ArticleResource::collection($result);
     }
 
     /**
@@ -28,8 +33,6 @@ class ArticleController extends Controller
 
     public function mediaUploader(FormRequest $request , Article $article)
     {
-
-
 
         $media = MediaUploader::fromSource($request->file('thumb'))
         ->toDestination('public', 'blog/thumbnails')
@@ -46,6 +49,7 @@ class ArticleController extends Controller
         }
     }
 
+
     public function store(StoreArticleRequest $request)
     {
         $request->safe()->all();
@@ -60,11 +64,8 @@ class ArticleController extends Controller
             'shortlink'=>url("/Articles",\Str::Random(8)),
             'show_at_popular'=>$request->show_at_popular,
             'archive'=>$request->archive,
-
         ]);
         $article->tag($request->tags);
-    
-
 
         return new ArticleResource($article);
 
@@ -81,16 +82,40 @@ class ArticleController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateArticleRequest $request, Article $article)
     {
-        //
+        $request->safe()->all();
+
+        if($article->author_id != auth()->user()->id)
+        {
+            return response()->json([
+                'message'=>'error you dont have permision',
+            ]);
+        }
+        $request->safe()->all();
+        $article->title = $request->title;
+        $article->content= $request->content;
+        $article->category_id =$request->category_id;
+        $article->meta_title = $request->meta_title;
+        $article->meta_description=$request->meta_description;
+        $article->show_at_popular=$request->show_at_popular;
+        $article->archive=$request->archive;
+        $article->save();
+
+        $article->retag($request->tags);
+
+        return new ArticleResource($article);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Article $article)
     {
-        //
+        $article->delete();
+        return response()->json([
+            'status'=>True,
+            'message' => 'Article Deleted',
+        ]);
     }
 }
