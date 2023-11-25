@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\ArticleController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\UploadFileController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -34,7 +35,8 @@ Route::group(['prefix'=>'auth/v1' , 'middleware'=>['auth:sanctum']], function(){
 Route::group(['prefix'=>'admin/v1' , 'middleware'=>['auth:sanctum']], function(){
     Route::apiResource('category' , CategoryController::class);
     Route::apiResource('article', ArticleController::class);
-    Route::post('media' , [ArticleController::class , 'mediaUploader']);
+
+    Route::post('media' , [UploadFileController::class , 'uploadImage']);
 });
 
 

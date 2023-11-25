@@ -34,6 +34,7 @@ class UpdateArticleRequest extends FormRequest
             'show_at_popular'=>['boolean'],
             'archive'=>['boolean'],
             'tags'=>['sometimes', 'string'],
+            'thumb_id'=>['nullable' , 'numeric'],
 
         ];
     }

@@ -11,7 +11,7 @@ use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Plank\Mediable\Facades\MediaUploader;
-
+use Plank\Mediable\Media;
 
 class ArticleController extends Controller
 {
@@ -27,48 +27,36 @@ class ArticleController extends Controller
         return ArticleResource::collection($result);
     }
 
+
     /**
      * Store a newly created resource in storage.
      */
-
-    public function mediaUploader(FormRequest $request , Article $article)
-    {
-
-        $media = MediaUploader::fromSource($request->file('thumb'))
-        ->toDestination('public', 'blog/thumbnails')
-        ->upload();
-        $article = Article::findOrfail($request->id);
-
-        $article->attachMedia($media, ['thumbnail']);
-
-        if($media){
-            return response()->json([
-                'msg' => 'your media uploaded',
-                'media' => $media
-            ]);
-        }
-    }
-
-
     public function store(StoreArticleRequest $request)
     {
-        $request->safe()->all();
+        try {
+            $article = Article::create([
+                'title'=>$request->title,
+                'content'=>$request->content,
+                'author_id'=>Auth::user()->id,
+                'category_id'=>$request->category_id,
+                'meta_title'=>$request->meta_title,
+                'meta_description'=>$request->meta_description,
+                'shortlink'=>url("/Articles",\Str::Random(8)),
+                'show_at_popular'=>$request->show_at_popular,
+                'archive'=>$request->archive,
+            ]);
 
-        $article = Article::create([
-            'title'=>$request->title,
-            'content'=>$request->content,
-            'author_id'=>Auth::user()->id,
-            'category_id'=>$request->category_id,
-            'meta_title'=>$request->meta_title,
-            'meta_description'=>$request->meta_description,
-            'shortlink'=>url("/Articles",\Str::Random(8)),
-            'show_at_popular'=>$request->show_at_popular,
-            'archive'=>$request->archive,
-        ]);
-        $article->tag($request->tags);
+            if($request->filled('thumb_id') &&  $media = Media::inDirectory('public' , 'blog/thumbnails')->find(request('thumb_id'), 'id') ){
+                $article->syncMedia($media, 'thumbnail');
+            }
+            $article->tag($request->tags);
+
+
+        }catch (\Exception $exception) {
+            abort(500, 'we have problem');
+        }
 
         return new ArticleResource($article);
-
     }
 
     /**
@@ -78,13 +66,12 @@ class ArticleController extends Controller
     {
         return new ArticleResource($article);
     }
-
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-        $request->safe()->all();
+
 
         if($article->author_id != auth()->user()->id)
         {
@@ -92,17 +79,25 @@ class ArticleController extends Controller
                 'message'=>'error you dont have permision',
             ]);
         }
-        $request->safe()->all();
-        $article->title = $request->title;
-        $article->content= $request->content;
-        $article->category_id =$request->category_id;
-        $article->meta_title = $request->meta_title;
-        $article->meta_description=$request->meta_description;
-        $article->show_at_popular=$request->show_at_popular;
-        $article->archive=$request->archive;
-        $article->save();
+        try {
+            $article->title = $request->title;
+            $article->content= $request->content;
+            $article->category_id =$request->category_id;
+            $article->meta_title = $request->meta_title;
+            $article->meta_description=$request->meta_description;
+            $article->show_at_popular=$request->show_at_popular;
+            $article->archive=$request->archive;
+            $article->save();
 
-        $article->retag($request->tags);
+            if($request->filled('thumb_id') &&  $media = Media::inDirectory('public' , 'blog/thumbnails')->find(request('thumb_id'), 'id') ){
+                $article->syncMedia($media, 'thumbnail');
+            }
+
+            $article->retag($request->tags);
+
+        }catch (\Exception $exception) {
+            abort(500, 'we have problem');
+        }
 
         return new ArticleResource($article);
     }

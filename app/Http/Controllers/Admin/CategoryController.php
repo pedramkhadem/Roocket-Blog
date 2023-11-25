@@ -25,7 +25,7 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-        $request->safe()->all();
+
 
         $category = Category::create([
             'name'=>$request->name,
@@ -49,7 +49,7 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-        $request->safe()->all();
+
 
         $category->name=$request->name;
         $category->save();
