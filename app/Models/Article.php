@@ -6,7 +6,10 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Cviebrock\EloquentTaggable\Taggable;
+use Maize\Markable\Markable;
 use Plank\Mediable\Mediable;
+use Maize\Markable\Models\Like;
+
 
 
 class Article extends Model
@@ -16,8 +19,10 @@ class Article extends Model
     use Sluggable;
     use Taggable;
     use Mediable;
+    use Markable;
 
-    
+
+
 
     protected  $fillable =[
         'title',
@@ -30,6 +35,10 @@ class Article extends Model
         'shortlink',
         'show_at_popular',
         'archive'
+    ];
+
+    protected static $marks = [
+        Like::class,
     ];
 
 /**get and store the article slug  */

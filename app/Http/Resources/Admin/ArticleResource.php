@@ -5,6 +5,7 @@ namespace App\Http\Resources\Admin;
 use Cviebrock\EloquentTaggable\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Maize\Markable\Models\Like;
 
 class ArticleResource extends JsonResource
 {
@@ -32,12 +33,17 @@ class ArticleResource extends JsonResource
                 'updated_at'=>$this->updated_at,
             ],
 
-            'tags' =>$this->when($this->tagArray ,function(){
-                return $this->tagArray;
-            }, null) ,
             'thumb'=>$this->when($this->hasMedia('thumbnail'), function() {
                 return $this->firstMedia('thumbnail')?->getUrl();
             }, null),
+
+            'likes' => $this->when($this->likes()->count(),function (){
+                return $this->likes()->count();
+            }, null),
+
+            'tags' =>$this->when($this->tagArray ,function(){
+                return $this->tagArray;
+            }, null) ,
 
             'show_at_popular'=>$this->show_at_popular,
             'archive'=>$this->archive,

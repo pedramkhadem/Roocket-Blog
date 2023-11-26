@@ -10,6 +10,8 @@ use App\Models\Article;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maize\Markable\Models\Like;
+use Maize\Markable\Models\Reaction;
 use Plank\Mediable\Facades\MediaUploader;
 use Plank\Mediable\Media;
 
@@ -33,11 +35,12 @@ class ArticleController extends Controller
      */
     public function store(StoreArticleRequest $request)
     {
+       $user=auth()->user();
         try {
             $article = Article::create([
                 'title'=>$request->title,
                 'content'=>$request->content,
-                'author_id'=>Auth::user()->id,
+                'author_id'=>$user->id,
                 'category_id'=>$request->category_id,
                 'meta_title'=>$request->meta_title,
                 'meta_description'=>$request->meta_description,
@@ -51,6 +54,9 @@ class ArticleController extends Controller
             }
             $article->tag($request->tags);
 
+            if($request->like){
+                Like::toggle($article,  $user );
+            }
 
         }catch (\Exception $exception) {
             abort(500, 'we have problem');
@@ -71,8 +77,7 @@ class ArticleController extends Controller
      */
     public function update(UpdateArticleRequest $request, Article $article)
     {
-
-
+        $user=auth()->user();
         if($article->author_id != auth()->user()->id)
         {
             return response()->json([
@@ -92,8 +97,11 @@ class ArticleController extends Controller
             if($request->filled('thumb_id') &&  $media = Media::inDirectory('public' , 'blog/thumbnails')->find(request('thumb_id'), 'id') ){
                 $article->syncMedia($media, 'thumbnail');
             }
-
             $article->retag($request->tags);
+
+           if($request->like ){
+                Like::toggle($article,  $user);
+            }
 
         }catch (\Exception $exception) {
             abort(500, 'we have problem');
