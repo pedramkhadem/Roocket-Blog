@@ -10,6 +10,7 @@ use App\Models\Article;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
 use Maize\Markable\Models\Reaction;
 use Plank\Mediable\Facades\MediaUploader;
@@ -57,6 +58,10 @@ class ArticleController extends Controller
             if($request->like){
                 Like::toggle($article,  $user );
             }
+            if($request->bookmark)
+            {
+                Bookmark::toggle($article , $user);
+            }
 
         }catch (\Exception $exception) {
             abort(500, 'we have problem');
@@ -99,8 +104,12 @@ class ArticleController extends Controller
             }
             $article->retag($request->tags);
 
-           if($request->like ){
+            if($request->like ){
                 Like::toggle($article,  $user);
+            }
+            if($request->bookmark)
+            {
+                Bookmark::toggle($article , $user);
             }
 
         }catch (\Exception $exception) {

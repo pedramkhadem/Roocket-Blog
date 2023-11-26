@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
 use Cviebrock\EloquentTaggable\Taggable;
 use Maize\Markable\Markable;
+use Maize\Markable\Models\Bookmark;
 use Plank\Mediable\Mediable;
 use Maize\Markable\Models\Like;
 
@@ -39,6 +40,7 @@ class Article extends Model
 
     protected static $marks = [
         Like::class,
+        Bookmark::class,
     ];
 
 /**get and store the article slug  */

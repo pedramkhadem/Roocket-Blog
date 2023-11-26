@@ -17,6 +17,7 @@ class ArticleResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = auth()->user();
         return [
 
             'id'=>$this->id,
@@ -40,6 +41,10 @@ class ArticleResource extends JsonResource
             'likes' => $this->when($this->likes()->count(),function (){
                 return $this->likes()->count();
             }, null),
+
+            'bookmark' => $this->when($this->bookmarks()->count(),function (){
+                return true;
+            },null),
 
             'tags' =>$this->when($this->tagArray ,function(){
                 return $this->tagArray;
