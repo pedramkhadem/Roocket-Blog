@@ -38,11 +38,11 @@ class ArticleResource extends JsonResource
                 return $this->firstMedia('thumbnail')?->getUrl();
             }, null),
 
-            'likes' => $this->when($this->likes()->count(),function (){
-                return $this->likes()->count();
+            'likes' => $this->when($this->likes()?->count(),function (){
+                return $this->likes()?->count();
             }, null),
 
-            'bookmark' => $this->when($this->bookmarks()->count(),function (){
+            'bookmark' => $this->when($this->bookmarks()?->count(),function (){
                 return true;
             },null),
 
