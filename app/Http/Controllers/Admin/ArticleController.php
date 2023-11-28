@@ -124,6 +124,11 @@ class ArticleController extends Controller
      */
     public function destroy(Article $article)
     {
+        $user=auth()->user();
+
+        like::remove($article , $user);
+        Bookmark::remove($article , $user);
+        $article->detag();
         $article->delete();
         return response()->json([
             'status'=>True,
@@ -131,3 +136,5 @@ class ArticleController extends Controller
         ]);
     }
 }
+
+
