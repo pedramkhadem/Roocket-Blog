@@ -9,6 +9,7 @@ use App\Http\Resources\Admin\CategoryResource;
 use App\Models\Category;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class CategoryController extends Controller
 {
@@ -25,15 +26,10 @@ class CategoryController extends Controller
      */
     public function store(StoreCategoryRequest $request)
     {
-
-
-        $category = Category::create([
-            'name'=>$request->name,
-
-        ]);
-
+        $category = Category::create(['name'=>$request->name]);
         return new CategoryResource($category);
     }
+
 
     /**
      * Display the specified resource.
@@ -49,7 +45,6 @@ class CategoryController extends Controller
      */
     public function update(UpdateCategoryRequest $request, Category $category)
     {
-
 
         $category->name=$request->name;
         $category->save();
@@ -67,5 +62,6 @@ class CategoryController extends Controller
             'status'=>True,
             'message' => 'Category Deleted',
         ]);
+
     }
 }

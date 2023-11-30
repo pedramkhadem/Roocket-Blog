@@ -10,6 +10,7 @@ use App\Models\Article;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
 use Maize\Markable\Models\Reaction;
@@ -24,7 +25,7 @@ class ArticleController extends Controller
     public function index()
     {
 
-        $result = Article::where('author_id' , auth()->id())->with(['tags' , 'media'])->paginate(15);
+        $result = Article::where('author_id' , auth()->id())->with(['tags' , 'media' ])->paginate(15);
 
 
         return ArticleResource::collection($result);
@@ -37,6 +38,8 @@ class ArticleController extends Controller
     public function store(StoreArticleRequest $request)
     {
        $user=auth()->user();
+
+       DB::beginTransaction();
         try {
             $article = Article::create([
                 'title'=>$request->title,
@@ -63,9 +66,14 @@ class ArticleController extends Controller
                 Bookmark::toggle($article , $user);
             }
 
+
         }catch (\Exception $exception) {
+
+            DB::rollback();
             abort(500, 'we have problem');
         }
+
+        DB::commit();
 
         return new ArticleResource($article);
     }
@@ -89,6 +97,7 @@ class ArticleController extends Controller
                 'message'=>'error you dont have permision',
             ]);
         }
+        DB::beginTransaction();
         try {
             $article->title = $request->title;
             $article->content= $request->content;
@@ -111,10 +120,12 @@ class ArticleController extends Controller
             {
                 Bookmark::toggle($article , $user);
             }
-
         }catch (\Exception $exception) {
+            DB::rollBack();
             abort(500, 'we have problem');
         }
+
+        DB::commit();
 
         return new ArticleResource($article);
     }
@@ -125,11 +136,14 @@ class ArticleController extends Controller
     public function destroy(Article $article)
     {
         $user=auth()->user();
+        DB::Transaction(function() use ($article){
+            $user=auth()->user();
+            like::remove($article , $user);
+            Bookmark::remove($article , $user);
+            $article->detag();
+            $article->delete();
 
-        like::remove($article , $user);
-        Bookmark::remove($article , $user);
-        $article->detag();
-        $article->delete();
+        });
         return response()->json([
             'status'=>True,
             'message' => 'Article Deleted',
