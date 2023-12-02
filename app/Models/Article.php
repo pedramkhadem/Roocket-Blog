@@ -43,6 +43,8 @@ class Article extends Model
         Bookmark::class,
     ];
 
+    protected  $withCount =['likes'];
+
 /**get and store the article slug  */
 
     public function sluggable(): array

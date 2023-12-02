@@ -8,29 +8,24 @@ use App\Http\Requests\UpdateArticleRequest;
 use App\Http\Resources\Admin\ArticleResource;
 use App\Models\Article;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Maize\Markable\Models\Bookmark;
 use Maize\Markable\Models\Like;
-use Maize\Markable\Models\Reaction;
-use Plank\Mediable\Facades\MediaUploader;
 use Plank\Mediable\Media;
+
+
 
 class ArticleController extends Controller
 {
-    /**
+      /**
      * Display a listing of the resource.
      */
     public function index()
     {
-
-        $result = Article::where('author_id' , auth()->id())->with(['tags' , 'media' ])->paginate(15);
-
-
+        $result = Article::where('author_id' , auth()->id())->with(['media' , 'tags' , 'bookmarks' ,'category:id,name'])->get();
         return ArticleResource::collection($result);
     }
-
 
     /**
      * Store a newly created resource in storage.
